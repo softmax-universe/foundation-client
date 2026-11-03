@@ -7,7 +7,7 @@ retry decision.
 Install the checked public archive without a private registry credential:
 
 ```sh
-pnpm add https://github.com/Metta-AI/foundation-models/releases/download/models-v0.1.0/softmax-foundation-models-0.1.0.tgz
+pnpm add https://github.com/Metta-AI/foundation-models/releases/download/models-v0.1.1/softmax-foundation-models-0.1.1.tgz
 ```
 
 ```ts

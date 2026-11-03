@@ -1,59 +1,6 @@
-export interface ModelCall {
-  id: string;
-  provider: string;
-  requestedModel: string;
-  model: string | null;
-  input: string;
-  output: string | null;
-  latencyMs: number | null;
-  status: 'pending' | 'completed' | 'failed' | 'unknown';
-  inputTokens?: number;
-  outputTokens?: number;
-  costUsd?: number;
-  error?: string;
-}
-
-export interface ModelMessage {
-  role: 'system' | 'user' | 'assistant';
-  content: string;
-}
-
-export interface GenerateInput {
-  messages: readonly ModelMessage[];
-  responseSchema: Record<string, unknown>;
-  maxOutputTokens: number;
-  signal: AbortSignal;
-  recordCall(call: ModelCall): Promise<void>;
-}
-
-export interface OpenRouterOptions {
-  apiKey: string;
-  model: string;
-  endpoint: string;
-  maxInputChars?: number;
-  maxResponseBytes?: number;
-  fetch?: typeof fetch;
-}
-
-export type ModelErrorCode =
-  | 'invalid_input'
-  | 'provider_aborted'
-  | 'provider_configuration'
-  | 'provider_failed'
-  | 'provider_http_error'
-  | 'provider_input_too_large'
-  | 'provider_invalid_response'
-  | 'provider_response_too_large';
-
-export class ModelError extends Error {
-  constructor(
-    readonly code: ModelErrorCode,
-    readonly status?: number,
-  ) {
-    super(code);
-    this.name = 'ModelError';
-  }
-}
+import { ModelError } from '../errors.js';
+import { type OpenRouterOptions } from './types.js';
+import { type GenerateInput, type ModelCall } from '../types.js';
 
 function record(value: unknown): Record<string, unknown> | undefined {
   if (value !== null && typeof value === 'object' && !Array.isArray(value)) {
