@@ -1,0 +1,40 @@
+{
+  "name": "@softmax-foundation/models",
+  "version": "0.1.0",
+  "description": "Bounded model calls with explicit usage evidence.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Metta-AI/foundation-factory.git",
+    "directory": "models"
+  },
+  "files": [
+    "dist/**/*.js",
+    "dist/**/*.d.ts",
+    "README.md"
+  ],
+  "type": "module",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org"
+  },
+  "scripts": {
+    "check": "pnpm type-check && pnpm lint",
+    "format": "oxfmt .",
+    "format:check": "oxfmt --check .",
+    "lint": "oxlint --deny-warnings .",
+    "type-check": "tsc --noEmit",
+    "build": "tsc --project tsconfig.build.json"
+  },
+  "devDependencies": {
+    "oxfmt": "0.65.0",
+    "oxlint": "1.80.0",
+    "typescript": "7.0.2"
+  }
+}
