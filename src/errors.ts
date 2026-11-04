@@ -1,11 +1,17 @@
-import { Data } from 'effect';
-import type { ModelErrorCode } from './types.js';
+import type { FoundationFailure } from './types.js';
 
-export class ModelError extends Data.TaggedError('ModelError')<{
-  code: ModelErrorCode;
-  status?: number;
-}> {
-  constructor(code: ModelErrorCode, status?: number) {
-    super({ code, ...(status === undefined ? {} : { status }) });
+export class FoundationError extends Error implements FoundationFailure {
+  readonly code;
+  readonly callId;
+  readonly outcome;
+  readonly status;
+
+  constructor(failure: FoundationFailure) {
+    super(`Foundation request failed: ${failure.code}`);
+    this.name = 'FoundationError';
+    this.code = failure.code;
+    this.callId = failure.callId;
+    this.outcome = failure.outcome;
+    this.status = failure.status;
   }
 }

@@ -1,15 +1,15 @@
 {
-  "name": "@softmax-foundation/models",
-  "version": "0.1.3",
-  "description": "Bounded model calls with explicit usage evidence.",
+  "name": "@softmax-foundation/client",
+  "version": "0.1.0",
+  "description": "Typed access to Foundation gateway APIs.",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Metta-AI/foundation-factory.git",
-    "directory": "models"
+    "url": "git+https://github.com/softmax-universe/foundation-factory.git",
+    "directory": "workspaces/gateway/client"
   },
   "files": [
-    "dist/**/*.js",
-    "dist/**/*.d.ts",
+    "dist/index.js",
+    "dist/index.d.ts",
     "README.md"
   ],
   "type": "module",
@@ -25,19 +25,16 @@
     "registry": "https://registry.npmjs.org"
   },
   "scripts": {
-    "check": "pnpm type-check && pnpm lint",
-    "format": "oxfmt .",
-    "format:check": "oxfmt --check .",
-    "lint": "oxlint --deny-warnings .",
-    "type-check": "tsc --noEmit",
-    "build": "tsc --project tsconfig.build.json"
+    "build": "tsc -p tsconfig.build.json && node scripts/build.mts",
+    "type-check": "tsc --noEmit"
   },
   "dependencies": {
     "effect": "4.0.7"
   },
   "devDependencies": {
-    "oxfmt": "0.65.0",
-    "oxlint": "1.80.0",
+    "@microsoft/api-extractor": "7.60.1",
+    "@types/node": "24.13.6",
+    "esbuild": "0.28.2",
     "typescript": "7.0.2"
   }
 }

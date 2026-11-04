@@ -1,45 +1,51 @@
-# Foundation Models
+# Foundation client
 
-`@softmax-foundation/models` makes one bounded OpenRouter call and records provider evidence. It runs in Node and
-Workers without Identity, game types, or private packages. The caller owns credentials, deadlines, budgets and any
-retry decision.
+`@softmax-foundation/client` connects applications to the Foundation gateway. The current API executes model calls
+under a revocable Foundation grant. Nexus issues that grant after approval; provider credentials stay on the server.
 
-Install the checked public archive without a private registry credential:
-
-```sh
-pnpm add https://github.com/Metta-AI/foundation-models/releases/download/models-v0.1.3/softmax-foundation-models-0.1.3.tgz
-```
+Install the immutable archive from the [public releases](https://github.com/softmax-universe/foundation-client/releases).
 
 ```ts
-import { createOpenRouterClient } from '@softmax-foundation/models';
+import { createFoundationClient, FoundationError } from '@softmax-foundation/client';
 
-const client = createOpenRouterClient({
-  apiKey: process.env.OPENROUTER_API_KEY!,
-  model: 'provider/model',
-  endpoint: 'https://openrouter.ai/api/v1/chat/completions',
-});
-const result = await client.generate({
-  messages: [{ role: 'user', content: 'Choose an action.' }],
-  responseSchema: {
-    type: 'object',
-    properties: { action: { type: 'string' } },
-    required: ['action'],
-    additionalProperties: false,
-  },
-  maxOutputTokens: 256,
-  signal: AbortSignal.timeout(30_000),
-  recordCall: async (call) => {
-    await saveCall(call);
-  },
-});
+const foundation = createFoundationClient({ endpoint, token });
+const input = {
+  id: crypto.randomUUID(),
+  model: 'openai/gpt-4.1-mini',
+  messages: [{ role: 'user' as const, content: 'Choose one legal move.' }],
+  responseSchema: { type: 'object', properties: { move: { type: 'integer' } }, required: ['move'] },
+  maxOutputTokens: 64,
+  deadlineAt: new Date(Date.now() + 25_000).toISOString(),
+};
+
+// Persist the request and its ID before starting paid work.
+await persistIntent(input);
+try {
+  const call = await foundation.models.call(input, { signal });
+  await persistEvidence(call);
+} catch (error) {
+  if (!(error instanceof FoundationError)) throw error;
+  await persistFailure({ id: error.callId, code: error.code, outcome: error.outcome });
+}
+
+const evidence = await foundation.models.getCall(input.id);
 ```
 
-`recordCall` receives an immutable snapshot with a stable call ID before dispatch and after the result changes.
-Persist the initial `pending` snapshot before returning from the callback. A callback failure prevents dispatch or
-surfaces a failure to save the result. An interrupted request becomes `unknown`; it is never retried automatically.
-`requestedModel` is the configured route; `model` is the provider-reported model, or `null` when unavailable.
-Usage and cost are included only when present in the completion response. There are no follow-up usage requests.
+Supply an explicit HTTPS origin and a Foundation bearer grant. Local HTTP is accepted only for loopback development.
+The client sends no cookies, refuses redirects, and accepts a `fetch` implementation for an actual transport boundary.
+Keep grants server-side unless the browser itself is the intended grant holder.
 
-`responseSchema` is sent to the provider; the caller validates the returned text against its domain. Credentials
-are excluded from evidence, redirects are rejected, input and response sizes are bounded, and `ModelError` exposes
-a safe code and optional HTTP status. Each call has exactly one HTTP attempt and disables provider fallbacks.
+`models.call` submits the caller's UUID exactly once, then polls pending evidence with GET. It waits until the supplied
+deadline or 30 seconds, whichever comes first. It returns terminal `completed`, `failed`, or `unknown` evidence.
+`models.getCall` performs one GET, bounded to 10 seconds, and can return `pending`. Both accept an `AbortSignal`.
+Cancellation stops the client's wait; it does not undo an accepted server call.
+
+`FoundationError` contains a fixed `code`, `callId`, `outcome`, and optional HTTP `status`. It omits response bodies,
+credentials, and transport causes. `not_started` identifies local validation/cancellation before submission or a known
+admission rejection for this submission. It does not erase earlier evidence if an application reuses a UUID.
+`unknown` means the call may have started: keep its ID and budget reservation, then reconcile
+with `getCall`. Never substitute a new ID after an uncertain result. The SDK never retries a POST or provider call.
+
+The archive bundles the public Models schemas and their declarations. Its only runtime dependency is public Effect.
+It exposes no grant administration, private RPC, database, or provider transport. To build the exported source, run
+`npm install`, then `npm run build`; the complete package appears in `release/`.

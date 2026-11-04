@@ -1,4 +1,17 @@
-export { createOpenRouterClient } from './openrouter/index.js';
-export type { OpenRouterOptions } from './openrouter/index.js';
-export { ModelError } from './errors.js';
-export type { ModelCall, ModelErrorCode, ModelMessage, GenerateInput } from './types.js';
+export { createFoundationClient } from './create-foundation-client.js';
+export { FoundationError } from './errors.js';
+export type {
+  FoundationClient,
+  FoundationClientOptions,
+  FoundationErrorCode,
+  FoundationFailure,
+  RequestOptions,
+} from './types.js';
+export {
+  CallId,
+  ModelCallInput,
+  ModelCallRecord,
+  ModelCallResponse,
+  ModelErrorCode,
+  ModelErrorResponse,
+} from './models-protocol/index.js';
