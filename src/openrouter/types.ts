@@ -1,3 +1,5 @@
+import type { Redacted } from 'effect';
+
 export interface OpenRouterOptions {
   apiKey: string;
   model: string;
@@ -5,4 +7,13 @@ export interface OpenRouterOptions {
   maxInputChars?: number;
   maxResponseBytes?: number;
   fetch?: typeof fetch;
+}
+
+export interface ProviderConfiguration {
+  apiKey: Redacted.Redacted<string>;
+  model: string;
+  endpoint: URL;
+  maxInputChars: number;
+  maxResponseBytes: number;
+  fetch: typeof fetch;
 }

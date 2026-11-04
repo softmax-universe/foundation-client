@@ -1,6 +1,6 @@
 {
   "name": "@softmax-foundation/models",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Bounded model calls with explicit usage evidence.",
   "repository": {
     "type": "git",
@@ -31,6 +31,9 @@
     "lint": "oxlint --deny-warnings .",
     "type-check": "tsc --noEmit",
     "build": "tsc --project tsconfig.build.json"
+  },
+  "dependencies": {
+    "effect": "4.0.7"
   },
   "devDependencies": {
     "oxfmt": "0.65.0",
